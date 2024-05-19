@@ -1,11 +1,22 @@
 import { useState } from "react";
 import { LuMenu } from "react-icons/lu";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logOutUser } = useAuth();
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logOutUser().then(() => {
+      toast.success("Logout Successfully");
+      navigate('/login')
+    });
+  };
   return (
-    <div className="fixed bg-transparent backdrop-blur-md max-w-screen-xl mx-auto px-4 inset-x-0 z-10 bg-opacity-50 bg-black text-white">
+    <div className="  backdrop-blur-md max-w-screen-xl mx-auto px-4 inset-x-0 z-10 bg-opacity-50 bg-black text-white">
       <div className="py-3">
         <div className="lg:flex lg:items-center lg:justify-between">
           <div className="flex items-center justify-between">
@@ -56,26 +67,56 @@ const Navbar = () => {
                 Home
               </NavLink>
               <NavLink
-                to="/topics"
+                to="/contact-us"
                 className={({ isActive }) => (isActive ? "text-[#43ec76]" : "")}
               >
-                Browse Topics
+                Contact Us
               </NavLink>
               <NavLink
-                to="/random"
+                to="/dashboard"
                 className={({ isActive }) => (isActive ? "text-[#43ec76]" : "")}
               >
-                Random Item
+                Dashboard
               </NavLink>
               <NavLink
-                to="/experts"
+                to="/menu"
                 className={({ isActive }) => (isActive ? "text-[#43ec76]" : "")}
               >
-                Experts
+                Our Menu
               </NavLink>
+              <NavLink
+                to="/shop/salad"
+                className={({ isActive }) => (isActive ? "text-[#43ec76]" : "")}
+              >
+                Our Shop
+              </NavLink>
+              <NavLink
+                to="/secret"
+                className={({ isActive }) => (isActive ? "text-[#43ec76]" : "")}
+              >
+                Secret
+              </NavLink>
+              {user && (
+                <button
+                  onClick={handleLogout}
+                  className="text-white border border-white rounded-lg px-4 py-1"
+                >
+                  Logout
+                </button>
+              )}
+              {!user && (
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    isActive ? "text-[#43ec76]" : ""
+                  }
+                >
+                  Login
+                </NavLink>
+              )}
             </div>
 
-            <div className="flex items-center mt-4 lg:mt-0">
+            {/* <div className="flex items-center mt-4 lg:mt-0">
               <button
                 type="button"
                 className="flex items-center focus:outline-none"
@@ -89,7 +130,7 @@ const Navbar = () => {
                   />
                 </div>
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
