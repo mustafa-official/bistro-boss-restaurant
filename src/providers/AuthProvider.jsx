@@ -1,20 +1,25 @@
 import PropTypes from "prop-types";
 import { createContext, useEffect, useState } from "react";
 import {
+  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
 } from "firebase/auth";
 import app from "../firebase/firebase.init";
+import useAxiosPublic from "../hooks/useAxiosPublic";
 const auth = getAuth(app);
 
 export const AuthContext = createContext(null);
 const AuthProvider = ({ children }) => {
+  const axiosPublic = useAxiosPublic();
   const [user, setUser] = useState(null);
-  console.log(user);
+  const googleProvider = new GoogleAuthProvider()
+  // console.log(user);
   const [loading, setLoading] = useState(true);
 
   const registerUser = (email, password) => {
@@ -25,6 +30,10 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     return signInWithEmailAndPassword(auth, email, password);
   };
+  const googleSignIn = ()=>{
+    setLoading(true);
+    return signInWithPopup(auth, googleProvider);
+  }
   const logOutUser = () => {
     setLoading(true);
     return signOut(auth);
@@ -38,13 +47,28 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if(currentUser){
+        //get token and store client side
+        const userInfo = {email: currentUser.email}
+        axiosPublic.post('/jwt', userInfo)
+        .then(res=>{
+          if(res.data.token){
+            localStorage.setItem('access-token', res.data.token)
+          }
+        })
+      }
+      else{
+        //Remove token(if token stored in the client side)
+        localStorage.removeItem('access-token')
+      }
       setLoading(false);
     });
     return () => {
       unSubscribe();
     };
-  }, []);
-  const authInfo = { user, loading, registerUser, loginUser, logOutUser, userUpdateProfile };
+  }, [axiosPublic]);
+
+  const authInfo = { user, loading, registerUser, loginUser,googleSignIn, logOutUser, userUpdateProfile };
   return (
     <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>
   );

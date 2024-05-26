@@ -3,16 +3,20 @@ import { LuMenu } from "react-icons/lu";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import { FaShoppingCart } from "react-icons/fa";
+import useCart from "../../hooks/useCart";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logOutUser } = useAuth();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [cart] = useCart();
+  // console.log(cart.length);
 
   const handleLogout = () => {
     logOutUser().then(() => {
       toast.success("Logout Successfully");
-      navigate('/login')
+      navigate("/login");
     });
   };
   return (
@@ -114,6 +118,11 @@ const Navbar = () => {
                   Login
                 </NavLink>
               )}
+
+              <div className="indicator">
+                <span className="indicator-item badge badge-secondary">{cart?.length}</span>
+                <Link to="/dashboard"><FaShoppingCart className="text-3xl"></FaShoppingCart></Link>
+              </div>
             </div>
 
             {/* <div className="flex items-center mt-4 lg:mt-0">

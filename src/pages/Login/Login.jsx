@@ -3,15 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   loadCaptchaEnginge,
   LoadCanvasTemplate,
-  LoadCanvasTemplateNoReload,
   validateCaptcha,
 } from "react-simple-captcha";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { loginUser } = useAuth();
+  const axiosPublic = useAxiosPublic();
+  const { loginUser, googleSignIn } = useAuth();
   const captchaRef = useRef(null);
   const [disabled, setDisabled] = useState(true);
   useEffect(() => {
@@ -42,6 +43,18 @@ const Login = () => {
       setDisabled(true);
     }
   };
+
+  const handleGoogleLogin = async () => {
+    const { user } = await googleSignIn();
+    const userInfo = {
+      name: user?.displayName,
+      email: user?.email,
+    };
+    console.log(userInfo);
+    const { data } = await axiosPublic.post("/users", userInfo);
+    console.log(data);
+    navigate("/");
+  };
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="flex w-full max-w-sm mx-auto overflow-hidden bg-white rounded-lg shadow-lg  lg:max-w-4xl ">
@@ -65,7 +78,10 @@ const Login = () => {
             Welcome back!
           </p>
 
-          <div className="flex cursor-pointer items-center justify-center mt-4 text-gray-600 transition-colors duration-300 transform border rounded-lg   hover:bg-gray-50 ">
+          <div
+            onClick={handleGoogleLogin}
+            className="flex cursor-pointer items-center justify-center mt-4 text-gray-600 transition-colors duration-300 transform border rounded-lg   hover:bg-gray-50 "
+          >
             <div className="px-4 py-2">
               <svg className="w-6 h-6" viewBox="0 0 40 40">
                 <path

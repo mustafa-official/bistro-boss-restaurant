@@ -17,7 +17,7 @@ const Testimonials = () => {
       .then((data) => setReviews(data));
   }, []);
 
-  console.log(reviews);
+  // console.log(reviews);
   return (
     <div className="my-8 md:my-16">
       <SectionHeading

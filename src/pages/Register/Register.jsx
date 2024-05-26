@@ -2,10 +2,12 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { registerUser, userUpdateProfile } = useAuth();
+  const axiosPublic = useAxiosPublic();
+  const { registerUser, userUpdateProfile, googleSignIn } = useAuth();
   const {
     register,
     handleSubmit,
@@ -14,14 +16,29 @@ const Register = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log(data);
+    // console.log(data);
     registerUser(data.email, data.password).then((result) => {
       console.log(result.user);
       userUpdateProfile(data.name, data.photo).then(() => {
-        toast.success("Register Successfully");
-        navigate("/");
+        const userInfo = {
+          name: data.name,
+          email: data.email,
+        };
+        axiosPublic.post("/users", userInfo).then((res) => {
+          if (res.data.insertedId) {
+            toast.success("Register Successfully");
+            navigate("/");
+          }
+        });
       });
     });
+  };
+
+  const handleGoogleSignUP = async () => {
+    const { user } = await googleSignIn();
+    toast.success("Sign up Successfully");
+    navigate("/");
+    console.log(user);
   };
 
   return (
@@ -40,7 +57,10 @@ const Register = () => {
             Get Your Free Account Now.
           </p>
 
-          <div className="flex cursor-pointer items-center justify-center mt-4 text-gray-600 transition-colors duration-300 transform border rounded-lg hover:bg-gray-50">
+          <div
+            onClick={handleGoogleSignUP}
+            className="flex cursor-pointer items-center justify-center mt-4 text-gray-600 transition-colors duration-300 transform border rounded-lg hover:bg-gray-50"
+          >
             <div className="px-4 py-2">
               <svg className="w-6 h-6" viewBox="0 0 40 40">
                 <path
@@ -63,7 +83,7 @@ const Register = () => {
             </div>
 
             <span className="w-5/6 px-4 py-3 font-bold text-center">
-              Sign in with Google
+              Sign up with Google
             </span>
           </div>
 

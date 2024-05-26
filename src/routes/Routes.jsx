@@ -8,6 +8,13 @@ import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import SecretPage from "../components/SecretPage";
 import PrivateRoute from "./PrivateRoute";
+import Dashboard from "../layout/Dashboard";
+import MyBooking from "../pages/Dashboard/MyBooking";
+import AllUsers from "../pages/Dashboard/AllUsers";
+import AddItems from "../pages/Dashboard/AddItems";
+import AdminRoute from "./AdminRoute";
+import ManageItems from "../pages/Dashboard/ManageItems";
+import Payment from "../pages/Payment/Payment";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +51,48 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register></Register>,
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <PrivateRoute>
+        <Dashboard></Dashboard>
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: "/dashboard",
+        element: <MyBooking></MyBooking>,
+      },
+      {
+        path: "/dashboard/payment",
+        element: <Payment></Payment>,
+      },
+      {
+        path: "all-users",
+        element: (
+          <AdminRoute>
+            <AllUsers></AllUsers>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "addItems",
+        element: (
+          <AdminRoute>
+            <AddItems></AddItems>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "manageItems",
+        element: (
+          <AdminRoute>
+            <ManageItems></ManageItems>
+          </AdminRoute>
+        ),
+      },
+    ],
   },
 ]);
 export default router;
